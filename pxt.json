@@ -1,0 +1,22 @@
+{
+    "name": "arcade-chat",
+    "version": "1.0.2",
+    "description": "Adds multiplayer chat to MakeCode Arcade games using the built-in online multiplayer.",
+    "license": "MIT",
+    "dependencies": {
+        "device": "*",
+        "game": "*"
+    },
+    "files": [
+        "main.ts",
+        "README.md"
+    ],
+    "testFiles": [
+        "test.ts"
+    ],
+    "targetVersions": {
+        "target": "arcade",
+        "pxt": "8.0.0"
+    },
+    "supportedTargets": ["arcade"]
+}
