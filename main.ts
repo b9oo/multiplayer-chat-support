@@ -7,37 +7,41 @@ namespace chat {
     let chatEnabled = false;
 
     /**
-     * Initialize multiplayer chat
+     * Initialize multiplayer chat (call this early)
      */
     //% block="initialize multiplayer chat"
     //% group="Chat"
     export function initializeChat() {
         chatEnabled = true;
         chatMessages = [];
-        // Note: Full custom string sending is limited in core mp.
-        // This extension provides UI + local handling.
-        // For real syncing across players, combine with arcade-mp extension.
     }
 
     /**
-     * Send a chat message (local for now - see note below)
+     * Send a chat message to all players
+     * @param message text to send (keep it short)
      */
     //% block="send chat message %message"
     //% group="Chat"
     export function sendMessage(message: string) {
         if (!chatEnabled || !message) return;
-        
-        const playerId = 1; // Placeholder - improve with arcade-mp
-        chatMessages.push(`P${playerId}: ${message}`);
+
+        const playerId = mp.getPlayerNumber();  // This is the correct function
+        if (playerId === 0) return; // Not in multiplayer
+
+        // For now: local echo + you can extend with mp.setPlayerState for syncing
+        const fullMsg = `P${playerId}: ${message}`;
+        chatMessages.push(fullMsg);
         if (chatMessages.length > 12) chatMessages.shift();
 
         if (onMessageReceivedHandler) {
             onMessageReceivedHandler(playerId, message);
         }
+
+        // TODO: Use mp.setPlayerState() with a custom state for real syncing across players
     }
 
     /**
-     * Get recent chat messages
+     * Get list of recent messages
      */
     //% block="recent chat messages"
     //% group="Chat"
@@ -46,7 +50,7 @@ namespace chat {
     }
 
     /**
-     * Clear chat history
+     * Clear chat
      */
     //% block="clear chat"
     //% group="Chat"
@@ -55,7 +59,7 @@ namespace chat {
     }
 
     /**
-     * On chat message received
+     * Run code when a message is received
      */
     //% block="on chat message received"
     //% group="Chat"
@@ -65,12 +69,12 @@ namespace chat {
     }
 
     /**
-     * My player number (placeholder)
+     * My player number (1-4)
      */
     //% block="my player number"
     //% group="Advanced"
     export function myPlayerNumber(): number {
-        return 1; // Replace with mp logic from arcade-mp extension if added
+        return mp.getPlayerNumber();
     }
 
     /**
@@ -84,7 +88,7 @@ namespace chat {
             text += msg + "\n";
         }
         if (chatMessages.length === 0) {
-            text += "No messages yet...";
+            text += "(No messages yet)";
         }
         game.showLongText(text, DialogLayout.Bottom);
     }
