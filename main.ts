@@ -7,7 +7,7 @@ namespace chat {
     let chatEnabled = false;
 
     /**
-     * Initialize multiplayer chat (call this early)
+     * Initialize multiplayer chat (call this in on start)
      */
     //% block="initialize multiplayer chat"
     //% group="Chat"
@@ -17,18 +17,17 @@ namespace chat {
     }
 
     /**
-     * Send a chat message to all players
-     * @param message text to send (keep it short)
+     * Send a chat message (currently local echo - real sync needs state tricks)
+     * @param message The message to send
      */
     //% block="send chat message %message"
     //% group="Chat"
     export function sendMessage(message: string) {
-        if (!chatEnabled || !message) return;
+        if (!chatEnabled || !message || message.length > 60) return;
 
-        const playerId = mp.getPlayerNumber();  // This is the correct function
-        if (playerId === 0) return; // Not in multiplayer
+        // Get current player (using mp blocks - you can replace with your player variable)
+        const playerId = 1; // Default - change to your actual player number variable
 
-        // For now: local echo + you can extend with mp.setPlayerState for syncing
         const fullMsg = `P${playerId}: ${message}`;
         chatMessages.push(fullMsg);
         if (chatMessages.length > 12) chatMessages.shift();
@@ -36,12 +35,10 @@ namespace chat {
         if (onMessageReceivedHandler) {
             onMessageReceivedHandler(playerId, message);
         }
-
-        // TODO: Use mp.setPlayerState() with a custom state for real syncing across players
     }
 
     /**
-     * Get list of recent messages
+     * Get recent chat messages
      */
     //% block="recent chat messages"
     //% group="Chat"
@@ -50,7 +47,7 @@ namespace chat {
     }
 
     /**
-     * Clear chat
+     * Clear all messages
      */
     //% block="clear chat"
     //% group="Chat"
@@ -59,7 +56,7 @@ namespace chat {
     }
 
     /**
-     * Run code when a message is received
+     * On chat message received
      */
     //% block="on chat message received"
     //% group="Chat"
@@ -69,21 +66,21 @@ namespace chat {
     }
 
     /**
-     * My player number (1-4)
+     * My player number (use your own variable or mp blocks)
      */
     //% block="my player number"
     //% group="Advanced"
     export function myPlayerNumber(): number {
-        return mp.getPlayerNumber();
+        return 1; // Replace with your player number in the game
     }
 
     /**
-     * Show chat on screen
+     * Show chat messages on screen
      */
     //% block="show chat messages"
     //% group="Chat"
     export function showChat() {
-        let text = "=== MULTIPLAYER CHAT ===\n\n";
+        let text = "=== CHAT ===\n\n";
         for (let msg of chatMessages) {
             text += msg + "\n";
         }
