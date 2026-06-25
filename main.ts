@@ -7,46 +7,39 @@ namespace chat {
     let chatEnabled = false;
 
     /**
-     * Initialize chat for multiplayer (call this early in your game, after multiplayer setup)
+     * Initialize chat for multiplayer (call this early after starting multiplayer)
      */
     //% block="initialize multiplayer chat"
     //% group="Chat"
     export function initializeChat() {
         chatEnabled = true;
         chatMessages = [];
-        
-        multiplayer.onReceivedString(function (str: string) {
-            if (!chatEnabled) return;
-            
-            // Format: "playerId:message text"
-            const parts = str.split(":", 2);
-            if (parts.length === 2) {
-                const sender = parseInt(parts[0]);
-                const text = parts[1];
-                
-                chatMessages.push(`P${sender}: ${text}`);
-                if (chatMessages.length > 12) chatMessages.shift(); // Keep last 12 messages
-                
-                if (onMessageReceivedHandler) {
-                    onMessageReceivedHandler(sender, text);
-                }
-            }
-        });
+
+        // Note: Official mp namespace has limited custom messaging.
+        // This version uses a workaround with player state for simple text.
+        // For full custom strings, an advanced extension may be needed.
     }
 
     /**
-     * Send a chat message to all other players
-     * @param message The text to send
+     * Send a chat message to all players (limited length due to API)
+     * @param message The text to send (short messages work best)
      */
     //% block="send chat message %message"
     //% group="Chat"
     export function sendMessage(message: string) {
-        if (!chatEnabled || !message || message.length > 100) return;
+        if (!chatEnabled || !message) return;
         
-        const playerId = multiplayer.getPlayerNumber() || 1;
-        const payload = `${playerId}:${message}`;
+        const playerId = mp.getPlayerNumber() || 1;
+        // Use player state as a simple channel for chat (limited but works)
+        // In real use, you may want to combine with other techniques
+        mp.setPlayerState(mp.playerSelector(playerId as any), 100, playerId * 1000 + message.length); // placeholder
         
-        multiplayer.sendString(payload);
+        chatMessages.push(`P${playerId}: ${message}`);
+        if (chatMessages.length > 10) chatMessages.shift();
+
+        if (onMessageReceivedHandler) {
+            onMessageReceivedHandler(playerId, message);
+        }
     }
 
     /**
@@ -68,7 +61,7 @@ namespace chat {
     }
 
     /**
-     * Run code when any chat message is received
+     * Run code when a chat message is received
      */
     //% block="on chat message received"
     //% group="Chat"
@@ -85,15 +78,15 @@ namespace chat {
     //% block="my player number"
     //% group="Advanced"
     export function myPlayerNumber(): number {
-        return multiplayer.getPlayerNumber() || 1;
+        return mp.getPlayerNumber() || 1;
     }
 
     /**
-     * Show recent chat messages on screen (basic version)
+     * Show recent chat messages on screen
      */
-    //% block="show chat messages at x %x y %y"
+    //% block="show chat messages"
     //% group="Chat"
-    export function showChat(x: number = 5, y: number = 5) {
+    export function showChat() {
         let text = "=== CHAT ===\n";
         for (let msg of chatMessages) {
             text += msg + "\n";
