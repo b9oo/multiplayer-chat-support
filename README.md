@@ -29,7 +29,5 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
 ## Requirements
 - MakeCode Arcade project with online multiplayer enabled
 
-## Publishing
-This extension is ready to publish. Just commit to GitHub and share the repo URL.
 
 Made with ❤️ for the MakeCode community.
