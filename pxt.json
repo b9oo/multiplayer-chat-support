@@ -1,11 +1,12 @@
 {
     "name": "arcade-chat",
-    "version": "1.0.2",
-    "description": "Adds multiplayer chat to MakeCode Arcade games using the built-in online multiplayer.",
+    "version": "1.0.3",
+    "description": "Adds multiplayer chat to MakeCode Arcade games.",
     "license": "MIT",
     "dependencies": {
         "device": "*",
-        "game": "*"
+        "game": "*",
+        "arcade-mp": "github:riknoll/arcade-mp"
     },
     "files": [
         "main.ts",
